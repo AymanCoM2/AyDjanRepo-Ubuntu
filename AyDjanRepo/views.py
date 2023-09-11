@@ -12,11 +12,28 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from .forms import CustomUserCreationForm  # Import your custom form
 from django.contrib.auth.models import User
+import datetime
 
-def generate_random_string(length):
-    characters = string.ascii_letters + string.digits
-    random_string = ''.join(random.choice(characters) for _ in range(length))
-    return random_string
+
+def clearStaticPath():
+    # TODO
+    pass
+
+
+def generate_random_string(cardCode, checkValue):
+    sampleTxt = ''
+    if (checkValue):
+        sampleTxt = 'With_Samples'
+    else:
+        sampleTxt = 'Without_samples'
+    # Get the current date and time
+    now = datetime.datetime.now()
+    # Format the date and time as Y_m_d_h
+    timestamp = now.strftime("%Y_%m_%d_%H_%S")
+    finalGeneratedName = sampleTxt+"_"+timestamp+"_"+cardCode
+    print(finalGeneratedName)
+    return finalGeneratedName
+
 
 def register(request):
     if request.method == 'POST':
@@ -40,6 +57,7 @@ def register(request):
 
     return render(request, 'registration/register.html', {'form': form})
 
+
 def custom_login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, request.POST)
@@ -52,6 +70,7 @@ def custom_login(request):
     return render(request, 'registration/login.html', {'form': form})
 
 # random_string = generate_random_string(7)
+
 
 def home(request):
     if request.method == 'GET':
@@ -66,8 +85,7 @@ def home(request):
     else:
         sample_data = False
 
-    # fileName = startingPoint(input_data, sample_data)
-    fileName = "r9E28Tm"
+    fileName = startingPoint(input_data, sample_data)
 
     context = {
         'input_data': input_data,
@@ -233,13 +251,14 @@ def update_ARwithATR(df1, df2, cardcode, pathFinal):
     df1 = df1[df1['ATR'] != 0]
     df1.sort_values(by=['ItemCode', 'DocNum', 'DocDate'], ascending=[
                     True, False, False], inplace=True, ignore_index=True)
+    clearStaticPath()
     return df1.to_excel(pathFinal, index=False)
 
 
 def startingPoint(cardCode, checkValue):
     finalPath = ""
     # LB_AvaliableToReturn.xlsx
-    randomFileName = generate_random_string(7)
+    randomFileName = generate_random_string(cardCode, checkValue)
     finalPath = finalPath + "./AyDjanRepo/static/" + randomFileName + ".xlsx"
 
     if checkValue == True:
