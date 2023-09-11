@@ -7,15 +7,51 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import random
 import string
-
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import CustomUserCreationForm  # Import your custom form
+from django.contrib.auth.models import User
 
 def generate_random_string(length):
     characters = string.ascii_letters + string.digits
     random_string = ''.join(random.choice(characters) for _ in range(length))
     return random_string
 
-# random_string = generate_random_string(7)
+def register(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            # Add allowed domains here
+            allowed_domains = ['gmail.com', 'yahoo.com']
+            if any(email.endswith(domain) for domain in allowed_domains):
+                # Create a new User instance with the email as the username
+                username = email
+                password = form.cleaned_data.get('password1')
+                User.objects.create_user(
+                    username, email=email, password=password)
+                # Redirect to a success page or login page
+                return redirect('login')
+            else:
+                pass
+    else:
+        form = CustomUserCreationForm()  # Use your custom form here without errors
 
+    return render(request, 'registration/register.html', {'form': form})
+
+def custom_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            # Redirect to a success page or another view
+            return redirect('success_page_name')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'registration/login.html', {'form': form})
+
+# random_string = generate_random_string(7)
 
 def home(request):
     if request.method == 'GET':
