@@ -21,6 +21,7 @@ def home(request):
     if request.method == 'GET':
         input_data = request.GET.get('dataInput', '')
         sample_data = request.GET.get('samples')
+        db_name = request.GET.get('db_name')
     else:
         input_data = ''
 
@@ -29,12 +30,14 @@ def home(request):
     else:
         sample_data = False
 
-    fileName = startingPoint(input_data, sample_data)
+    # fileName = startingPoint(input_data, sample_data)
+    fileName = "r9E28Tm"
 
     context = {
         'input_data': input_data,
         'sample_data': sample_data,
-        'fileName': fileName + ".xlsx"
+        'fileName': fileName + ".xlsx",
+        'db_name': db_name
     }
 
     return render(request, 'home.html', context)
@@ -117,9 +120,10 @@ query_4 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 
 
 def QueryData(query, cardcode):
-    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+    cnxn_str = ("Driver={SQL Server};"
                 "Server=10.10.10.100;"
-                "Database=LB;"
+                "Database=TM;"
                 "UID=ayman;"
                 "PWD=admin@1234;")
     cnxn = pyodbc.connect(cnxn_str)
