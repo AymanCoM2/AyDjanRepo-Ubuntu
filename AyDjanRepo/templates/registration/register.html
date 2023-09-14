@@ -17,6 +17,18 @@
             <div class="card-body">
               <form method="post" class="form">
                 {% csrf_token %}
+                {% if form.errors %}
+                  <div class="alert alert-danger">
+                    <strong>Error:</strong>
+                    <ul>
+                      {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                          <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
                 <div class="form-group">
                   <label for="{{ form.email.id_for_label }}">Email</label>
                   <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" class="form-control">
