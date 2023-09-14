@@ -13,11 +13,37 @@ from django.contrib.auth import login
 from .forms import CustomUserCreationForm  # Import your custom form
 from django.contrib.auth.models import User
 import datetime
+import os
+
 
 
 def clearStaticPath():
-    # TODO
     pass
+    # current_directory = os.getcwd()
+    # docs_folder_path = os.path.join(current_directory, 'AyDjanRepo')
+    # static_folder_path = os.path.join(docs_folder_path, 'static')
+    # file_names = []
+    # for root, dirs, files in os.walk(static_folder_path):
+    #     for file in files:
+    #         file_path = os.path.join(root, file)
+    #         file_names.append(file_path)
+    # current_time = datetime.datetime.now()
+    # for file_path in file_names:
+    #     try:
+    #         file_name = os.path.basename(file_path)
+    #         timestamp_str = file_name.split('_')[-1]
+    #         timestamp = datetime.datetime.strptime(
+    #             timestamp_str, "%Y_%m_%d_%H_%S")
+    #         time_difference = (current_time - timestamp).total_seconds()
+    #         print(
+    #             f"File: {file_name}, Timestamp: {timestamp}, Time Difference: {time_difference} seconds")
+    #         if time_difference > 10:
+    #             os.remove(file_path)
+    #             print(f"Deleted file: {file_path}")
+    #     except ValueError:
+    #         print(f"Error parsing timestamp for file: {file_name}")
+
+
 
 
 def generate_random_string(cardCode, checkValue):
@@ -29,11 +55,10 @@ def generate_random_string(cardCode, checkValue):
     # Get the current date and time
     now = datetime.datetime.now()
     # Format the date and time as Y_m_d_h
-    timestamp = now.strftime("%Y_%m_%d_%H_%S")
-    finalGeneratedName = sampleTxt+"_"+timestamp+"_"+cardCode
-    print(finalGeneratedName)
+    timestamp = now.strftime("%Y_%m_%d_%H_%M_%S")
+    finalGeneratedName = cardCode+"_"+sampleTxt+"_"+timestamp
+    # print(finalGeneratedName)
     return finalGeneratedName
-
 
 def register(request):
     if request.method == 'POST':
