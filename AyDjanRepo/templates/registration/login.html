@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Login</title>
+    <!-- Add Bootstrap CSS link -->
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -14,8 +15,16 @@
           <div class="card">
             <div class="card-header">Login</div>
             <div class="card-body">
-              <form method="post">
-                {% csrf_token %} {{ form.as_p }}
+              <form method="post" class="form">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="{{ form.username.id_for_label }}">Username</label>
+                  <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="{{ form.password.id_for_label }}">Password</label>
+                  <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" class="form-control">
+                </div>
                 <button type="submit" class="btn btn-primary">Login</button>
               </form>
             </div>
@@ -27,6 +36,7 @@
       </div>
     </div>
 
+    <!-- Add Bootstrap JavaScript and jQuery (optional) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
