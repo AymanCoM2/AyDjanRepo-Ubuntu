@@ -16,33 +16,26 @@ import datetime
 import os
 
 
-
 def clearStaticPath():
-    pass
-    # current_directory = os.getcwd()
-    # docs_folder_path = os.path.join(current_directory, 'AyDjanRepo')
-    # static_folder_path = os.path.join(docs_folder_path, 'static')
-    # file_names = []
-    # for root, dirs, files in os.walk(static_folder_path):
-    #     for file in files:
-    #         file_path = os.path.join(root, file)
-    #         file_names.append(file_path)
-    # current_time = datetime.datetime.now()
-    # for file_path in file_names:
-    #     try:
-    #         file_name = os.path.basename(file_path)
-    #         timestamp_str = file_name.split('_')[-1]
-    #         timestamp = datetime.datetime.strptime(
-    #             timestamp_str, "%Y_%m_%d_%H_%S")
-    #         time_difference = (current_time - timestamp).total_seconds()
-    #         print(
-    #             f"File: {file_name}, Timestamp: {timestamp}, Time Difference: {time_difference} seconds")
-    #         if time_difference > 10:
-    #             os.remove(file_path)
-    #             print(f"Deleted file: {file_path}")
-    #     except ValueError:
-    #         print(f"Error parsing timestamp for file: {file_name}")
+    current_directory = os.getcwd()
+    docs_folder_path = os.path.join(current_directory, 'AyDjanRepo')
+    static_folder_path = os.path.join(docs_folder_path, 'static')
+    file_names = []
+    for root, dirs, files in os.walk(static_folder_path):
+        for file in files:
+            if (file.startswith("_")):
+                file_path = os.path.join(root, file)
+                os.remove(file_path)
+            else:
+                file_path = os.path.join(root, file)
+                file_names.append(file_path)
 
+    file_names.sort()
+
+
+    if (len(file_names) >= 15):
+        for x in range(5):
+            os.remove(file_names[x])
 
 
 
@@ -60,21 +53,23 @@ def generate_random_string(cardCode, checkValue):
     # print(finalGeneratedName)
     return finalGeneratedName
 
+
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data.get('email')
             # Add allowed domains here
-            allowed_domains = ['gmail.com', 'yahoo.com']
+            allowed_domains = ['lbaik.com',
+                               'devo-p.com', 'aljouai.com', '2coom.com']
             if any(email.endswith(domain) for domain in allowed_domains):
                 # Create a new User instance with the email as the username
                 username = email
                 password = form.cleaned_data.get('password1')
                 User.objects.create_user(
                     username, email=email, password=password)
-                # Redirect to a success page or login page
-                return redirect('login')
+                # Redirect to the "home" page after successful registration
+                return redirect('home-page')
             else:
                 pass
     else:
