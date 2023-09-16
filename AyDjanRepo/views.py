@@ -32,11 +32,9 @@ def clearStaticPath():
 
     file_names.sort()
 
-
     if (len(file_names) >= 15):
         for x in range(5):
             os.remove(file_names[x])
-
 
 
 def generate_random_string(cardCode, checkValue):
@@ -105,7 +103,9 @@ def home(request):
     else:
         sample_data = False
 
-    fileName = startingPoint(input_data, sample_data)
+    dbParam = str(db_name)
+
+    fileName = startingPoint(input_data, sample_data, dbParam)
 
     context = {
         'input_data': input_data,
@@ -192,15 +192,48 @@ query_4 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
            "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
            "WHERE  T0.CardCode = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'")
 
+# This is the Line TO CHANGE
 
-def QueryData(query, cardcode):
-    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-    cnxn_str = ("Driver={SQL Server};"
+
+def QueryData(query, cardcode, dbParameter):
+
+    if (dbParameter is None):
+        dbParameter = "TM"
+    cnxn_str = ""
+
+    if (dbParameter == "TM"):
+            cnxn_str = ( "Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                "Server=10.10.10.100;"
+                "Database=TM;"
+                "UID=ayman;"
+                "PWD=admin@1234;") 
+    elif (dbParameter == "LB"):
+            cnxn_str = ( "Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                "Server=10.10.10.100;"
+                "Database=LB;"
+                "UID=ayman;"
+                "PWD=admin@1234;")
+    else : 
+            cnxn_str = ( "Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                 "Server=10.10.10.100;"
                 "Database=TM;"
                 "UID=ayman;"
                 "PWD=admin@1234;")
+
+    # SERVER = '10.10.10.100'
+    # DATABASE = dbParameter
+    # USERNAME = 'ayman'
+    # PASSWORD = 'admin@1234'
+
+    # connectionString = f'DRIVER={{/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
+    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+    # cnxn_str = ( "Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+    #             "Server=10.10.10.100;"
+    #             "Database=TM;"
+    #             "UID=ayman;"
+    #             "PWD=admin@1234;")
     cnxn = pyodbc.connect(cnxn_str)
+
     data = pd.read_sql(query, cnxn, params=[cardcode])
 
     return data
@@ -275,22 +308,22 @@ def update_ARwithATR(df1, df2, cardcode, pathFinal):
     return df1.to_excel(pathFinal, index=False)
 
 
-def startingPoint(cardCode, checkValue):
+def startingPoint(cardCode, checkValue, dbParameter):
     finalPath = ""
     # LB_AvaliableToReturn.xlsx
     randomFileName = generate_random_string(cardCode, checkValue)
     finalPath = finalPath + "./AyDjanRepo/static/" + randomFileName + ".xlsx"
 
     if checkValue == True:
-        out_df1 = QueryData(query_3, cardCode)
+        out_df1 = QueryData(query_3, cardCode, dbParameter)
         out_ATR = AvaliableToReturn(out_df1)
-        out_df2 = QueryData(query_4, cardCode)
+        out_df2 = QueryData(query_4, cardCode, dbParameter)
         update_ARwithATR(out_df2, out_ATR, cardCode, finalPath)
 
     else:
-        out_df1 = QueryData(query_1, cardCode)
+        out_df1 = QueryData(query_1, cardCode, dbParameter)
         out_ATR = AvaliableToReturn(out_df1)
-        out_df2 = QueryData(query_2, cardCode)
+        out_df2 = QueryData(query_2, cardCode, dbParameter)
         update_ARwithATR(out_df2, out_ATR, cardCode, finalPath)
 
     return randomFileName
