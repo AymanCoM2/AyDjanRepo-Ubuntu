@@ -194,7 +194,6 @@ query_4 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 
 # This is the Line TO CHANGE
 
-
 def QueryData(query, cardcode, dbParameter):
 
     if (dbParameter is None):
