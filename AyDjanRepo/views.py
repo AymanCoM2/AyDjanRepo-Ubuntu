@@ -15,7 +15,10 @@ from django.contrib.auth.models import User
 import datetime
 import os
 
-
+# ! TODO 
+# ^ The Code Makes Sometimes Duplicates about the Creation Of 
+# New Users ,, I dont Know the Reason yet 
+# * 
 def clearStaticPath():
     current_directory = os.getcwd()
     docs_folder_path = os.path.join(current_directory, 'AyDjanRepo')
