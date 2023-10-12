@@ -1,13 +1,10 @@
 import warnings
 import pyodbc
-from datetime import datetime, timedelta
+from datetime import datetime
 import pandas as pd
 import numpy as np
 from django.shortcuts import render
-from django.http import HttpResponse
-import random
-import string
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from .forms import CustomUserCreationForm  # Import your custom form
@@ -15,10 +12,12 @@ from django.contrib.auth.models import User
 import datetime
 import os
 
-# ! TODO 
-# ^ The Code Makes Sometimes Duplicates about the Creation Of 
-# New Users ,, I dont Know the Reason yet 
-# * 
+# ! TODO
+# ^ The Code Makes Sometimes Duplicates about the Creation Of
+# New Users ,, I dont Know the Reason yet
+# *
+
+
 def clearStaticPath():
     current_directory = os.getcwd()
     docs_folder_path = os.path.join(current_directory, 'AyDjanRepo')
@@ -63,20 +62,49 @@ def register(request):
             # Add allowed domains here
             allowed_domains = ['lbaik.com',
                                'devo-p.com', 'aljouai.com', '2coom.com']
+
             if any(email.endswith(domain) for domain in allowed_domains):
-                # Create a new User instance with the email as the username
-                username = email
-                password = form.cleaned_data.get('password1')
-                User.objects.create_user(
-                    username, email=email, password=password)
-                # Redirect to the "home" page after successful registration
-                return redirect('home-page')
+                # Check if a user with the same email already exists
+                if User.objects.filter(email=email).exists():
+                    # Handle the case where the user is already registered
+                    return render(request, 'registration/registration_error.html')
+                else:
+                    # Create a new User instance with the email as the username
+                    username = email
+                    password = form.cleaned_data.get('password1')
+                    User.objects.create_user(
+                        username, email=email, password=password)
+                    # Redirect to the "home" page after successful registration
+                    return redirect('home-page')
             else:
                 pass
     else:
         form = CustomUserCreationForm()  # Use your custom form here without errors
 
     return render(request, 'registration/register.html', {'form': form})
+
+
+# def register(request):
+#     if request.method == 'POST':
+#         form = CustomUserCreationForm(request.POST)
+#         if form.is_valid():
+#             email = form.cleaned_data.get('email')
+#             # Add allowed domains here
+#             allowed_domains = ['lbaik.com',
+#                                'devo-p.com', 'aljouai.com', '2coom.com']
+#             if any(email.endswith(domain) for domain in allowed_domains):
+#                 # Create a new User instance with the email as the username
+#                 username = email
+#                 password = form.cleaned_data.get('password1')
+#                 User.objects.create_user(
+#                     username, email=email, password=password)
+#                 # Redirect to the "home" page after successful registration
+#                 return redirect('home-page')
+#             else:
+#                 pass
+#     else:
+#         form = CustomUserCreationForm()  # Use your custom form here without errors
+#     return render(request, 'registration/register.html', {'form': form})
 
 
 def custom_login(request):
@@ -89,8 +117,6 @@ def custom_login(request):
     else:
         form = AuthenticationForm()
     return render(request, 'registration/login.html', {'form': form})
-
-# random_string = generate_random_string(7)
 
 
 def home(request):
@@ -197,6 +223,7 @@ query_4 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 
 # This is the Line TO CHANGE
 
+
 def QueryData(query, cardcode, dbParameter):
 
     if (dbParameter is None):
@@ -204,36 +231,24 @@ def QueryData(query, cardcode, dbParameter):
     cnxn_str = ""
 
     if (dbParameter == "TM"):
-            cnxn_str = ( "Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                "Server=10.10.10.100;"
-                "Database=TM;"
-                "UID=ayman;"
-                "PWD=admin@1234;") 
+        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    "Server=10.10.10.100;"
+                    "Database=TM;"
+                    "UID=ayman;"
+                    "PWD=admin@1234;")
     elif (dbParameter == "LB"):
-            cnxn_str = ( "Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                "Server=10.10.10.100;"
-                "Database=LB;"
-                "UID=ayman;"
-                "PWD=admin@1234;")
-    else : 
-            cnxn_str = ( "Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                "Server=10.10.10.100;"
-                "Database=TM;"
-                "UID=ayman;"
-                "PWD=admin@1234;")
+        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    "Server=10.10.10.100;"
+                    "Database=LB;"
+                    "UID=ayman;"
+                    "PWD=admin@1234;")
+    else:
+        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    "Server=10.10.10.100;"
+                    "Database=TM;"
+                    "UID=ayman;"
+                    "PWD=admin@1234;")
 
-    # SERVER = '10.10.10.100'
-    # DATABASE = dbParameter
-    # USERNAME = 'ayman'
-    # PASSWORD = 'admin@1234'
-
-    # connectionString = f'DRIVER={{/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
-    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-    # cnxn_str = ( "Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-    #             "Server=10.10.10.100;"
-    #             "Database=TM;"
-    #             "UID=ayman;"
-    #             "PWD=admin@1234;")
     cnxn = pyodbc.connect(cnxn_str)
 
     data = pd.read_sql(query, cnxn, params=[cardcode])
