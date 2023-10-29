@@ -12,11 +12,6 @@ from django.contrib.auth.models import User
 import datetime
 import os
 
-# ! TODO
-# ^ The Code Makes Sometimes Duplicates about the Creation Of
-# New Users ,, I dont Know the Reason yet
-# *
-
 
 def clearStaticPath():
     current_directory = os.getcwd()
