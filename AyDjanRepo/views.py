@@ -119,37 +119,30 @@ def main_page(request):
 
 
 def allcodeController(request):
-    if request.method == 'GET' and request.GET.get('samples') is not None:
+    if request.method == 'GET':
         input_data = request.GET.get('dataInput', 'ALL')
         sample_data = request.GET.get('samples')
         db_name = request.GET.get('db_name')
-        if (request.GET.get('samples') == 'on'):
-            sample_data = True
-            fileName = startingPointALL(sample_data)  # ! TODO
-            context = {
-                'input_data': input_data,
-                'sample_data': sample_data,
-                'fileName': fileName + ".xlsx",
-                # 'db_name': db_name
-            }
-            return render(request, 'allcode.html', context)
-        else:
-            sample_data = False
-            fileName = startingPointALL(sample_data)  # ! TODO
-            context = {
-                'input_data': input_data,
-                'sample_data': sample_data,
-                'fileName': fileName + ".xlsx",
-                # 'db_name': db_name
-            }
-            return render(request, 'allcode.html', context)
-
     else:
         input_data = ''
-        return render(request, 'allcode.html')
+
+    if (sample_data == 'on'):
+        sample_data = True
+    else:
+        sample_data = False
+
     dbParam = str(db_name)
 
-    
+    fileName = startingPointALL(sample_data) # ! TODO 
+
+    context = {
+        'input_data': input_data,
+        'sample_data': sample_data,
+        'fileName': fileName + ".xlsx",
+        # 'db_name': db_name
+    }
+
+    return render(request, 'allcode.html', context)
 
 
 def cardcodeController(request):
@@ -265,21 +258,21 @@ def QueryData(query, cardcode, dbParameter):
 
     if (dbParameter == "TM"):
         # cnxn_str = ("Driver={SQL Server};"
-        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     elif (dbParameter == "LB"):
         # cnxn_str = ("Driver={SQL Server};"
-        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=LB;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     else:
         # cnxn_str = ("Driver={SQL Server};"
-        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=TM;"
                     "UID=ayman;"
@@ -386,148 +379,148 @@ def startingPoint(cardCode, checkValue, dbParameter):
 warnings.filterwarnings('ignore')
 
 query_1A = ("With INV AS("
-            "SELECT "
-            "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+"SELECT " 
+"V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
+"MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
 
-            "FROM OINV V0 "
-            "INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry "
-            "LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
-            "WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) NOT LIKE N'%عين%' "
-            "GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), "
+"FROM OINV V0 "
+"INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry " 
+"LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
+"WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) NOT LIKE N'%عين%' " 
+"GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), " 
 
-            "INR AS("
-            "SELECT "
-            "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-            "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', MAX(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+"INR AS("
+"SELECT "
+"MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
+"MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', MAX(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
 
-            "FROM ORIN R0 "
-            "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
-            "LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K "
-            "WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) NOT LIKE N'%عين%' "
-            "GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) "
+"FROM ORIN R0 "
+"INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
+"LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K "
+"WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) NOT LIKE N'%عين%' "
+"GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) "
 
-            "SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, "
-            "V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments "
-
-            "FROM INR R LEFT JOIN INV V "
-            "ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate "
-            "--WHERE R.CardCode = (?) "
-            "ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
+"SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, "
+"V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments "
+         
+"FROM INR R LEFT JOIN INV V "
+"ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate " 
+"--WHERE R.CardCode = (?) "
+"ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
 
 
 # In[3]:
 
 
 query_2A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
-            "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
-            "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
-            "WHERE  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%'")
+"T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
+"FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
+"WHERE  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%'")
 
 
 # In[4]:
 
 
 query_3A = ("With INV AS("
-            "SELECT "
-            "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+"SELECT " 
+"V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
+"MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
 
-            "FROM OINV V0 "
-            "INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry "
-            "LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
-            "WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) LIKE N'%عين%' "
-            "GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), "
+"FROM OINV V0 "
+"INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry " 
+"LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
+"WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) LIKE N'%عين%' " 
+"GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), " 
 
-            "INR AS("
-            "SELECT "
-            "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-            "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', MAX(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+"INR AS("
+"SELECT "
+"MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
+"MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', MAX(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
 
-            "FROM ORIN R0 "
-            "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
-            "LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K "
-            "WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) LIKE N'%عين%' "
-            "GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) "
+"FROM ORIN R0 "
+"INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
+"LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K "
+"WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) LIKE N'%عين%' "
+"GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) "
 
-            "SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, "
-            "V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments "
-
-            "FROM INR R LEFT JOIN INV V "
-            "ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate "
-            "--WHERE R.CardCode = (?) "
-            "ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
+"SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, "
+"V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments "
+         
+"FROM INR R LEFT JOIN INV V "
+"ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate " 
+"--WHERE R.CardCode = (?) "
+"ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
 
 
 query_4A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
-            "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
-            "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
-            "WHERE T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'")
+"T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
+"FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
+"WHERE T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'")
 
 
 def QueryDataALL(query):
     # cnxn_str = ("Driver={SQL Server};"
     cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                "Server=10.10.10.100;"
-                "Database=LB;"
-                "UID=ayman;"
-                "PWD=admin@1234;")
+            "Server=10.10.10.100;"
+            "Database=LB;"
+            "UID=ayman;"
+            "PWD=admin@1234;")
     cnxn = pyodbc.connect(cnxn_str)
     data = pd.read_sql(query, cnxn, params=[])
-
-    return data
-
+    
+    return data    
 
 def AvaliableToReturnALL(df):
-
-    df.sort_values(by=['RDocDate', 'RDocNum', 'ItemCode', 'VDocDate', 'VDocNum'], ascending=[
-                   True, True, True, False, False], inplace=True, ignore_index=True)
-
+    
+    df.sort_values(by=['RDocDate','RDocNum','ItemCode','VDocDate', 'VDocNum'], ascending=[True,True,True,False,False], inplace=True, ignore_index =True)
+    
     df['ATR'] = df['VQty']
     df['Returned'] = 0.0
-
+    
+    
     for i in df['RDocNum'].unique():
         UniRID = i
-
+    
         for j in df['ItemCode'][df['RDocNum'] == UniRID].unique():
             UniIT = j
-
-            RQty = df['RQty'][(df['RDocNum'] == UniRID) &
-                              (df['ItemCode'] == UniIT)]
-            returnQty = max(np.append(RQty, 0))
+        
+            RQty = df['RQty'][(df['RDocNum'] == UniRID) & (df['ItemCode'] == UniIT)]    
+            returnQty = max(np.append(RQty,0))
             updateATR = {}
-
-            if (np.isnan(df['VDocNum'][(df['RDocNum'] == UniRID) & (df['ItemCode'] == UniIT)]).all()):
+        
+            if(np.isnan(df['VDocNum'][(df['RDocNum'] == UniRID) & (df['ItemCode'] == UniIT)]).all()):
                 continue
-
+            
             for ind, row in df[(df['RDocNum'] == UniRID) & (df['ItemCode'] == UniIT)].iterrows():
-
+        
+                
                 if (returnQty <= df['ATR'][ind]):
 
                     df['ATR'][ind] = df['ATR'][ind] - returnQty
                     df['Returned'][ind] = returnQty
                     returnQty = 0
+                
 
                 elif (returnQty > df['ATR'][ind]):
-
+                
                     returnQty = returnQty - df['ATR'][ind]
                     df['Returned'][ind] = df['ATR'][ind]
                     df['ATR'][ind] = 0
+                
 
+            
                 updateATR[df['VDocNum'][ind]] = df['ATR'][ind]
-
-            # update
-            idxn = np.where((df['VDocNum'].isin(updateATR.keys())) & (
-                df['ItemCode'] == UniIT))
+                    
+            
+            #update
+            idxn = np.where((df['VDocNum'].isin(updateATR.keys())) & (df['ItemCode'] == UniIT))
             for i in df.loc[idxn].index:
                 df['ATR'][i] = updateATR[df['VDocNum'][i]]
-
-    sub_df = df[['VDocNum', 'VDocDate', 'ItemCode', 'Dscription', 'VQty',
-                 'Returned', 'ATR', 'VSP', 'CardCode', 'CardName', 'Comments']]
+    
+    sub_df = df[['VDocNum', 'VDocDate', 'ItemCode', 'Dscription', 'VQty', 'Returned', 'ATR', 'VSP', 'CardCode', 'CardName', 'Comments']]
     return sub_df
-
 
 def update_ARwithATRALL(df1, df2, pathFinal):
     df1['ATR'] = df1['Quantity']
@@ -552,7 +545,7 @@ def update_ARwithATRALL(df1, df2, pathFinal):
 def startingPointALL(checkValue):
     finalPath = ""
     # LB_AvaliableToReturn.xlsx
-    randomFileName = generate_random_string("ALL", 7)
+    randomFileName = generate_random_string("ALL" , 7)
     finalPath = finalPath + "./AyDjanRepo/static/" + randomFileName + ".xlsx"
 
     if checkValue == True:
