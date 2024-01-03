@@ -12,11 +12,6 @@ from django.contrib.auth.models import User
 import datetime
 import os
 
-# ! TODO
-# ^ The Code Makes Sometimes Duplicates about the Creation Of
-# New Users ,, I dont Know the Reason yet
-# *
-
 
 def clearStaticPath():
     current_directory = os.getcwd()
@@ -231,18 +226,21 @@ def QueryData(query, cardcode, dbParameter):
     cnxn_str = ""
 
     if (dbParameter == "TM"):
+        # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     elif (dbParameter == "LB"):
+        # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=LB;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     else:
+        # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=TM;"
@@ -273,8 +271,8 @@ def AvaliableToReturn(df):
                               (df['ItemCode'] == UniIT)]
             returnQty = max(np.append(RQty, 0))
             updateATR = {}
-
-            if (np.isnan(df['VDocNum'][(df['RDocNum'] == UniRID) & (df['ItemCode'] == UniIT)]).all()):
+            if (df['VDocNum'][(df['RDocNum'] == UniRID) & (df['ItemCode'] == UniIT)].isnull().all()):
+                # if (np.isnan(df['VDocNum'][(df['RDocNum'] == UniRID) & (df['ItemCode'] == UniIT)]).all()):
                 continue
 
             for ind, row in df[(df['RDocNum'] == UniRID) & (df['ItemCode'] == UniIT)].iterrows():
