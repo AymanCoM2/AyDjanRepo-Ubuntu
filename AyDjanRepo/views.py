@@ -123,31 +123,30 @@ def allcodeController(request):
         input_data = request.GET.get('dataInput', 'ALL')
         sample_data = request.GET.get('samples')
         db_name = request.GET.get('db_name')
+        if (request.GET.get('samples') == 'on'):
+            sample_data = True
+            fileName = startingPointALL(sample_data)  # ! TODO
+            context = {
+                'input_data': input_data,
+                'sample_data': sample_data,
+                'fileName': fileName + ".xlsx",
+                # 'db_name': db_name
+            }
+            return render(request, 'allcode.html', context)
+        else:
+            sample_data = False
+            fileName = startingPointALL(sample_data)  # ! TODO
+            context = {
+                'input_data': input_data,
+                'sample_data': sample_data,
+                'fileName': fileName + ".xlsx",
+                # 'db_name': db_name
+            }
+            return render(request, 'allcode.html', context)
+
     else:
         input_data = ''
         return render(request, 'allcode.html')
-
-    if (request.GET.get('samples') == 'on'):
-        sample_data = True
-        fileName = startingPointALL(sample_data)  # ! TODO
-        context = {
-            'input_data': input_data,
-            'sample_data': sample_data,
-            'fileName': fileName + ".xlsx",
-            # 'db_name': db_name
-        }
-        return render(request, 'allcode.html', context)
-    else:
-        sample_data = False
-        fileName = startingPointALL(sample_data)  # ! TODO
-        context = {
-            'input_data': input_data,
-            'sample_data': sample_data,
-            'fileName': fileName + ".xlsx",
-            # 'db_name': db_name
-        }
-        return render(request, 'allcode.html', context)
-
     dbParam = str(db_name)
 
     
