@@ -119,7 +119,7 @@ def main_page(request):
 
 
 def allcodeController(request):
-    if request.method == 'GET':
+    if request.method == 'GET' and request.GET.get('samples') is not None:
         input_data = request.GET.get('dataInput', 'ALL')
         sample_data = request.GET.get('samples')
         db_name = request.GET.get('db_name')
