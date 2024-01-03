@@ -378,7 +378,7 @@ def startingPoint(cardCode, checkValue, dbParameter):
 # ==========================================================
 warnings.filterwarnings('ignore')
 
-query_1 = ("With INV AS("
+query_1A = ("With INV AS("
 "SELECT " 
 "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
 "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
@@ -413,7 +413,7 @@ query_1 = ("With INV AS("
 # In[3]:
 
 
-query_2 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
+query_2A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
 "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
 "WHERE  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%'")
@@ -422,7 +422,7 @@ query_2 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 # In[4]:
 
 
-query_3 = ("With INV AS("
+query_3A = ("With INV AS("
 "SELECT " 
 "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
 "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
@@ -454,7 +454,7 @@ query_3 = ("With INV AS("
 "ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
 
 
-query_4 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
+query_4A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
 "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
 "WHERE T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'")
@@ -549,15 +549,15 @@ def startingPointALL(checkValue):
     finalPath = finalPath + "./AyDjanRepo/static/" + randomFileName + ".xlsx"
 
     if checkValue == True:
-        out_df1 = QueryDataALL(query_3)
+        out_df1 = QueryDataALL(query_3A)
         out_ATR = AvaliableToReturnALL(out_df1)
-        out_df2 = QueryDataALL(query_4)
+        out_df2 = QueryDataALL(query_4A)
         update_ARwithATRALL(out_df2, out_ATR, finalPath)
 
     else:
-        out_df1 = QueryDataALL(query_1)
+        out_df1 = QueryDataALL(query_1A)
         out_ATR = AvaliableToReturnALL(out_df1)
-        out_df2 = QueryDataALL(query_2)
+        out_df2 = QueryDataALL(query_2A)
         update_ARwithATRALL(out_df2, out_ATR, finalPath)
 
     return randomFileName
