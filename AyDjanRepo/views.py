@@ -186,8 +186,10 @@ warnings.filterwarnings('ignore')
 query_1 = ("With INV AS("
            "SELECT "
            "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
-
+           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',"
+           "CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99"
+           "else SUM(V1.Quantity) END AS 'VQty',"
+           "MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
            "FROM OINV V0 "
            "INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry "
            "LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
@@ -221,7 +223,10 @@ query_2 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 query_3 = ("With INV AS("
            "SELECT "
            "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',"
+           "CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99"
+           "else SUM(V1.Quantity) END AS 'VQty',"           
+           "MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
 
            "FROM OINV V0 "
@@ -388,7 +393,10 @@ warnings.filterwarnings('ignore')
 query_1A = ("With INV AS("
             "SELECT "
             "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',"
+            "CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99"
+            "else SUM(V1.Quantity) END AS 'VQty',"
+            "MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
 
             "FROM OINV V0 "
@@ -432,7 +440,10 @@ query_2A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 query_3A = ("With INV AS("
             "SELECT "
             "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',"
+            "CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99"
+            "else SUM(V1.Quantity) END AS 'VQty',"
+            "MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
 
             "FROM OINV V0 "
@@ -573,7 +584,10 @@ def startingPointALL(checkValue):
 query_1B = ("""With INV AS(
 SELECT  
 V0.DocNum 'VDocNum', V0.DocDate 'VDocDate',D1.CardFName 'Foreign Name' ,MAX(V0.CardCode)'Card Code', MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', 
-MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' 
+MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',
+CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99
+else SUM(V1.Quantity) END AS 'VQty',
+MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' 
 
 
 FROM OINV V0 
@@ -612,7 +626,10 @@ query_2B = ("SELECT D1.CardFName'Foreign Name',T0.CardCode,T0.CardName,T0.DocNum
 query_3B = ("With INV AS("
             "SELECT "
             "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', D1.CardFName 'Foreign Name' ,MAX(V0.CardCode)'Card Code', MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',"
+            "CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99"
+            "else SUM(V1.Quantity) END AS 'VQty',"
+            "MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
 
             "FROM OINV V0 "
