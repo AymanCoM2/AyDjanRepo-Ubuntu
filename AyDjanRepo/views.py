@@ -256,22 +256,22 @@ def QueryData(query, cardcode, dbParameter):
     cnxn_str = ""
 
     if (dbParameter == "TM"):
-        cnxn_str = ("Driver={SQL Server};"
-                    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+        # cnxn_str = ("Driver={SQL Server};"
+                    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     elif (dbParameter == "LB"):
-        cnxn_str = ("Driver={SQL Server};"
-                    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+        # cnxn_str = ("Driver={SQL Server};"
+                    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=LB;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     else:
-        cnxn_str = ("Driver={SQL Server};"
-                    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+        # cnxn_str = ("Driver={SQL Server};"
+                    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=TM;"
                     "UID=ayman;"
@@ -460,8 +460,8 @@ query_4A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 
 
 def QueryDataALL(query):
-    cnxn_str = ("Driver={SQL Server};"
-    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+    # cnxn_str = ("Driver={SQL Server};"
+    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
             "Server=10.10.10.100;"
             "Database=LB;"
             "UID=ayman;"
