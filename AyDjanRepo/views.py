@@ -178,8 +178,7 @@ warnings.filterwarnings('ignore')
 query_1 = ("With INV AS("
            "SELECT "
            "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
-
+           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
            "FROM OINV V0 "
            "INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry "
@@ -190,7 +189,7 @@ query_1 = ("With INV AS("
            "INR AS("
            "SELECT "
            "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-           "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', MAX(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+           "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
 
            "FROM ORIN R0 "
            "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
@@ -214,7 +213,7 @@ query_2 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 query_3 = ("With INV AS("
            "SELECT "
            "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
 
            "FROM OINV V0 "
@@ -226,7 +225,7 @@ query_3 = ("With INV AS("
            "INR AS("
            "SELECT "
            "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-           "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', MAX(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+           "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
 
            "FROM ORIN R0 "
            "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
@@ -257,22 +256,22 @@ def QueryData(query, cardcode, dbParameter):
     cnxn_str = ""
 
     if (dbParameter == "TM"):
-        # cnxn_str = ("Driver={SQL Server};"
-                    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+        cnxn_str = ("Driver={SQL Server};"
+                    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     elif (dbParameter == "LB"):
-        # cnxn_str = ("Driver={SQL Server};"
-                    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+        cnxn_str = ("Driver={SQL Server};"
+                    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=LB;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     else:
-        # cnxn_str = ("Driver={SQL Server};"
-                    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+        cnxn_str = ("Driver={SQL Server};"
+                    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
                     "Server=10.10.10.100;"
                     "Database=TM;"
                     "UID=ayman;"
@@ -381,7 +380,7 @@ warnings.filterwarnings('ignore')
 query_1A = ("With INV AS("
 "SELECT " 
 "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-"MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+"MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
 
 "FROM OINV V0 "
@@ -393,7 +392,7 @@ query_1A = ("With INV AS("
 "INR AS("
 "SELECT "
 "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-"MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', MAX(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+"MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
 
 "FROM ORIN R0 "
 "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
@@ -425,7 +424,7 @@ query_2A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 query_3A = ("With INV AS("
 "SELECT " 
 "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-"MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', MAX(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+"MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
 
 
 "FROM OINV V0 "
@@ -437,7 +436,7 @@ query_3A = ("With INV AS("
 "INR AS("
 "SELECT "
 "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-"MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', MAX(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+"MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
 
 "FROM ORIN R0 "
 "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
@@ -461,8 +460,8 @@ query_4A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
 
 
 def QueryDataALL(query):
-    # cnxn_str = ("Driver={SQL Server};"
-    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+    cnxn_str = ("Driver={SQL Server};"
+    # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
             "Server=10.10.10.100;"
             "Database=LB;"
             "UID=ayman;"

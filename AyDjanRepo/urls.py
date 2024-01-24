@@ -16,10 +16,10 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),  # ! Ok
     path('', views.main_page, name="home_page"),  # ! Ok
-    path('main-page/', views.main_page, name="main_page"),  # ! Ok 
-    path('card-code/', views.cardcodeController, name='card_code'),  # ! Ok 
-    path('all-code/', views.allcodeController, name='all_code'),  # ^ NOT Ok 
-    path('success/', views.main_page, name='success_page_name'), # ! Ok 
-    path('register/', views.register, name='register'),  # ! Ok 
-    path('accounts/login/', views.custom_login, name='login'),  # ! Ok 
+    path('main-page/', views.main_page, name="main_page"),  # ! Ok
+    path('card-code/', views.cardcodeController, name='card_code'),  # ! Ok
+    path('all-code/', views.allcodeController, name='all_code'),  # ^ NOT Ok
+    path('success/', views.main_page, name='success_page_name'),  # ! Ok
+    path('register/', views.register, name='register'),  # ! Ok
+    path('accounts/login/', views.custom_login, name='login'),  # ! Ok
 ]
