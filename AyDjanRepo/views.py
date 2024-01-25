@@ -183,76 +183,86 @@ def cardcodeControllerB(request):
 # ==========================================================
 warnings.filterwarnings('ignore')
 
-query_1 = ("With INV AS("
-           "SELECT "
-           "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+query_1 = ("""With INV AS(
+           SELECT 
+           V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', 
+           MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',
+           CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99 
+           ELSE SUM(V1.Quantity) END AS 'VQty',
+           MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' 
+           FROM OINV V0 
+           INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry 
+           LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K 
+           WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) NOT LIKE N'%عين%' 
+           GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), 
 
-           "FROM OINV V0 "
-           "INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry "
-           "LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
-           "WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) NOT LIKE N'%عين%' "
-           "GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), "
+           INR AS(
+           SELECT 
+           MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', 
+           MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' 
 
-           "INR AS("
-           "SELECT "
-           "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-           "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+           FROM ORIN R0 
+           INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry 
+           LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K 
+           WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) NOT LIKE N'%عين%' 
+           GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) 
 
-           "FROM ORIN R0 "
-           "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
-           "LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K "
-           "WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) NOT LIKE N'%عين%' "
-           "GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) "
+           SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, 
+           V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments 
 
-           "SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, "
-           "V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments "
+           FROM INR R LEFT JOIN INV V 
+           ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate 
+           WHERE R.CardCode = (?) 
+           ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
-           "FROM INR R LEFT JOIN INV V "
-           "ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate "
-           "WHERE R.CardCode = (?) "
-           "ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
+query_2 = (""" SELECT T0.CardCode,T0.CardName,T0.DocNum, 
+           T0.DocDate,T1.ItemCode, T1.Dscription,
+           CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
+           ELSE T1.Quantity END AS 'Quantity',
+           T1.INMPrice,T0.Comments 
+           FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
+          WHERE  T0.CardCode = (?) AND  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' """)
 
-query_2 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
-           "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
-           "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
-           "WHERE  T0.CardCode = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%'")
-
-query_3 = ("With INV AS("
-           "SELECT "
-           "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-           "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+query_3 = ("""With INV AS(
+           SELECT 
+           V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', 
+           MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',
+           CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99 
+           ELSE SUM(V1.Quantity) END AS 'VQty',           
+           MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' 
 
 
-           "FROM OINV V0 "
-           "INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry "
-           "LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
-           "WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) LIKE N'%عين%' "
-           "GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), "
+           FROM OINV V0 
+           INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry 
+           LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K 
+           WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) LIKE N'%عين%' 
+           GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), 
 
-           "INR AS("
-           "SELECT "
-           "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-           "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+           INR AS(
+           SELECT 
+           MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', 
+           MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' 
 
-           "FROM ORIN R0 "
-           "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
-           "LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K "
-           "WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) LIKE N'%عين%' "
-           "GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) "
+           FROM ORIN R0 
+           INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry 
+           LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K 
+           WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) LIKE N'%عين%' 
+           GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) 
 
-           "SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, "
-           "V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments "
+           SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, 
+           V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments 
 
-           "FROM INR R LEFT JOIN INV V "
-           "ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate "
-           "WHERE R.CardCode = (?) "
-           "ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
+           FROM INR R LEFT JOIN INV V 
+           ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate 
+           --WHERE R.CardCode = (?) 
+           ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
-query_4 = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
-           "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
-           "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
-           "WHERE  T0.CardCode = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'")
+query_4 = ("""SELECT T0.CardCode,T0.CardName,T0.DocNum, 
+           T0.DocDate,T1.ItemCode, T1.Dscription,
+		   CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
+           ELSE T1.Quantity END AS 'Quantity',T1.INMPrice,T0.Comments 
+           FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
+           WHERE  T0.CardCode = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'""")
 
 # This is the Line TO CHANGE
 
@@ -385,86 +395,100 @@ def startingPoint(cardCode, checkValue, dbParameter):
 # ==========================================================
 warnings.filterwarnings('ignore')
 
-query_1A = ("With INV AS("
-            "SELECT "
-            "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+query_1A = (""" With INV AS(
+            SELECT 
+            V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', 
+            MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',
+            CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99 
+            ELSE SUM(V1.Quantity) END AS 'VQty',
+            MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' 
 
 
-            "FROM OINV V0 "
-            "INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry "
-            "LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
-            "WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) NOT LIKE N'%عين%' "
-            "GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), "
+            FROM OINV V0 
+            INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry 
+            LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K 
+            WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) NOT LIKE N'%عين%' 
+            GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), 
 
-            "INR AS("
-            "SELECT "
-            "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-            "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+            INR AS(
+            SELECT 
+            MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', 
+            MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' 
 
-            "FROM ORIN R0 "
-            "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
-            "LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K "
-            "WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) NOT LIKE N'%عين%' "
-            "GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) "
+            FROM ORIN R0 
+            INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry 
+            LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K 
+            WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) NOT LIKE N'%عين%' 
+            GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) 
 
-            "SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, "
-            "V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments "
+            SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, 
+            V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments 
 
-            "FROM INR R LEFT JOIN INV V "
-            "ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate "
-            "--WHERE R.CardCode = (?) "
-            "ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
+            FROM INR R LEFT JOIN INV V 
+            ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate 
+            --WHERE R.CardCode = (?) 
+            ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """ )
 
 
 # In[3]:
 
 
-query_2A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
-            "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
-            "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
-            "WHERE  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%'")
+query_2A = (""" SELECT T0.CardCode,T0.CardName,T0.DocNum, 
+            T0.DocDate,T1.ItemCode, T1.Dscription,
+            CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
+            ELSE T1.Quantity END AS 'Quantity',
+            T1.INMPrice,T0.Comments 
+            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
+            WHERE  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' """)
 
 
 # In[4]:
 
 
-query_3A = ("With INV AS("
-            "SELECT "
-            "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+query_3A = (""" With INV AS(
+            SELECT 
+            V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', V0.CardCode, MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', 
+            MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',
+            CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99 
+            ELSE SUM(V1.Quantity) END AS 'VQty',
+            MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' 
 
 
-            "FROM OINV V0 "
-            "INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry "
-            "LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
-            "WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) LIKE N'%عين%' "
-            "GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), "
+            FROM OINV V0 
+            INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry 
+            LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K 
+            WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) LIKE N'%عين%' 
+            GROUP BY V0.CardCode,  V0.DocDate, V0.DocNum, V1.ItemCode), 
 
-            "INR AS("
-            "SELECT "
-            "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-            "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+            INR AS(
+            SELECT 
+            MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', R0.DocDate 'RDocDate', R0.CardCode, MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', 
+            MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' 
 
-            "FROM ORIN R0 "
-            "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
-            "LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K "
-            "WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) LIKE N'%عين%' "
-            "GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) "
+            FROM ORIN R0 
+            INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry 
+            LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K 
+            WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) LIKE N'%عين%' 
+            GROUP BY R0.CardCode,  R0.DocDate, R0.DocNum, R1.ItemCode) 
 
-            "SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, "
-            "V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments "
+            SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName, R.ItemCode,R.Dscription,R.RQty, 
+            V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments 
 
-            "FROM INR R LEFT JOIN INV V "
-            "ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate "
-            "--WHERE R.CardCode = (?) "
-            "ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
+            FROM INR R LEFT JOIN INV V 
+            ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate 
+            --WHERE R.CardCode = (?) 
+            ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
 
-query_4A = ("SELECT T0.CardCode,T0.CardName,T0.DocNum, "
-            "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
-            "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) "
-            "WHERE T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'")
+
+
+query_4A = (""" SELECT T0.CardCode,T0.CardName,T0.DocNum, 
+            T0.DocDate,T1.ItemCode, T1.Dscription,
+	    CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
+            ELSE T1.Quantity END AS 'Quantity',
+	    T1.INMPrice,T0.Comments 
+            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
+            WHERE T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%' """)
 
 
 def QueryDataALL(query):
@@ -573,7 +597,10 @@ def startingPointALL(checkValue):
 query_1B = ("""With INV AS(
 SELECT  
 V0.DocNum 'VDocNum', V0.DocDate 'VDocDate',D1.CardFName 'Foreign Name' ,MAX(V0.CardCode)'Card Code', MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', 
-MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' 
+MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',
+CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99
+else SUM(V1.Quantity) END AS 'VQty',
+MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' 
 
 
 FROM OINV V0 
@@ -604,48 +631,57 @@ WHERE R.[Foreign Name] =(?)
 ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
 
-query_2B = ("SELECT D1.CardFName'Foreign Name',T0.CardCode,T0.CardName,T0.DocNum, "
-            "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
-            "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry LEFT JOIN OCRD D1 ON T0.CardCode = D1.CardCode) "
-            "WHERE  D1.CardFName = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%'")
+query_2B = ("""SELECT D1.CardFName'Foreign Name',T0.CardCode,T0.CardName,T0.DocNum, 
+            T0.DocDate,T1.ItemCode, T1.Dscription,
+	    CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
+            ELSE T1.Quantity END AS 'Quantity',
+	    T1.INMPrice,T0.Comments 
+            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry LEFT JOIN OCRD D1 ON T0.CardCode = D1.CardCode) 
+            WHERE  D1.CardFName = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' """)
 
-query_3B = ("With INV AS("
-            "SELECT "
-            "V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', D1.CardFName 'Foreign Name' ,MAX(V0.CardCode)'Card Code', MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', "
-            "MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription', SUM(V1.Quantity) 'VQty', MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' "
+query_3B = (""" With INV AS(
+            SELECT 
+            V0.DocNum 'VDocNum', V0.DocDate 'VDocDate', D1.CardFName 'Foreign Name' ,MAX(V0.CardCode)'Card Code', MAX(V0.CardName) 'CardName',MAX(V0.Comments) 'Comments', 
+            MAX(V1.ItemCode) 'ItemCode', MAX(V1.Dscription)'Dscription',
+            CASE WHEN MAX(V1.ItemCode)='25090102067' and V0.DocNum='101194' and SUM(V1.Quantity)=500 THEN SUM(V1.Quantity)-99
+            else SUM(V1.Quantity) END AS 'VQty',
+            MAX(T00.U_NAME) 'VSP', MAX(V0.NumAtCard) 'NumAtCard' 
 
 
-            "FROM OINV V0 "
-            "INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry "
-            "LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K "
-            "LEFT JOIN OCRD D1 ON V0.CardCode = D1.CardCode"
-            "WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) LIKE N'%عين%' "
-            "GROUP BY D1.CardFName,  V0.DocDate, V0.DocNum, V1.ItemCode), "
+            FROM OINV V0 
+            INNER JOIN INV1 V1 ON V0.DocEntry = V1.DocEntry 
+            LEFT JOIN OUSR T00 ON V0.USERSIGN = T00.INTERNAL_K 
+            LEFT JOIN OCRD D1 ON V0.CardCode = D1.CardCode
+            WHERE V0.CANCELED = 'N' AND ISNULL(V0.Comments,0) LIKE N'%عين%' 
+            GROUP BY D1.CardFName,  V0.DocDate, V0.DocNum, V1.ItemCode), 
 
-            "INR AS("
-            "SELECT "
-            "MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', D1.CardFName 'Foreign Name',R0.DocDate 'Doc Date', MAX(R0.CardCode)'Card Code', MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', "
-            "MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' "
+            INR AS(
+            SELECT 
+            MAX(R0.U_Ref) 'RInvoiceID',R0.DocNum 'RDocNum', D1.CardFName 'Foreign Name',R0.DocDate 'RDocDate', MAX(R0.CardCode)'CardCode', MAX(R0.CardName) 'CardName',MAX(R0.Comments)'Comments', 
+            MAX(R1.ItemCode)'ItemCode',MAX(R1.Dscription) 'Dscription', SUM(R1.Quantity) 'RQty',MAX(T00.U_NAME) 'RSP' 
 
-            "FROM ORIN R0 "
-            "INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry "
-            "LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K "
-            "LEFT JOIN OCRD D1 ON R0.CardCode = D1.CardCode"
-            "WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) LIKE N'%عين%' "
-            "GROUP BY D1.CardFName,  R0.DocDate, R0.DocNum, R1.ItemCode) "
+            FROM ORIN R0 
+            INNER JOIN RIN1 R1 ON R0.DocEntry = R1.DocEntry 
+            LEFT JOIN OUSR T00 ON R0.USERSIGN = T00.INTERNAL_K 
+            LEFT JOIN OCRD D1 ON R0.CardCode = D1.CardCode
+            WHERE R0.CANCELED = 'N' AND ISNULL(R0.Comments,0) LIKE N'%عين%' 
+            GROUP BY D1.CardFName,  R0.DocDate, R0.DocNum, R1.ItemCode) 
 
-            "SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName,R.[Foreign Name], R.ItemCode,R.Dscription,R.RQty, "
-            "V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments "
+            SELECT R.RDocNum, R.RDocDate, R.CardCode, R.CardName,R.[Foreign Name], R.ItemCode,R.Dscription,R.RQty, 
+            V.VDocNum, V.VDocDate,V.VQty, V.VSP, V.Comments 
 
-            "FROM INR R LEFT JOIN INV V "
-            "ON R.[Foreign Name] = V.[Foreign Name] AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate "
-            "--WHERE R.[Foreign Name] = (?) "
-            "ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC ")
+            FROM INR R LEFT JOIN INV V 
+            ON R.[Foreign Name] = V.[Foreign Name] AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate 
+            WHERE R.[Foreign Name] = (?) 
+            ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """ )
 
-query_4B = ("SELECT D1.CardFName,T0.CardCode,T0.CardName,T0.DocNum, "
-            "T0.DocDate,T1.ItemCode, T1.Dscription,T1.Quantity,T1.INMPrice,T0.Comments "
-            "FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry LEFT JOIN OCRD D1 ON T0.CardCode = D1.CardCode) "
-            "WHERE   T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'")
+query_4B = (""" SELECT D1.CardFName,T0.CardCode,T0.CardName,T0.DocNum, 
+            T0.DocDate,T1.ItemCode, T1.Dscription,
+			CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
+            ELSE T1.Quantity END AS 'Quantity',
+			T1.INMPrice,T0.Comments 
+            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry LEFT JOIN OCRD D1 ON T0.CardCode = D1.CardCode) 
+            WHERE D1.CardFName = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%' """)
 
 
 def QueryDataB(query):
