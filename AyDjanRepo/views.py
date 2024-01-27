@@ -254,7 +254,7 @@ query_3 = ("""With INV AS(
 
            FROM INR R LEFT JOIN INV V 
            ON R.CardCode = V.CardCode AND R.ItemCode = V.ItemCode AND R.RDocDate >= V.VDocDate 
-           --WHERE R.CardCode = (?) 
+           WHERE R.CardCode = (?) 
            ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
 query_4 = ("""SELECT T0.CardCode,T0.CardName,T0.DocNum, 
