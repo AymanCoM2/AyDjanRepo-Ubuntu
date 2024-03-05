@@ -113,13 +113,14 @@ def allcodeController(request):
 
     dbParam = str(db_name)
 
-    fileName = startingPointALL(sample_data)  # ! TODO
+    # fileName = startingPointALL(sample_data)  # ! TODO
+    fileName = startingPointALL(sample_data, dbParam)
 
     context = {
         'input_data': input_data,
         'sample_data': sample_data,
         'fileName': fileName + ".xlsx",
-        # 'db_name': db_name
+        'db_name': db_name
     }
 
     return render(request, 'allcode.html', context)
@@ -276,21 +277,24 @@ def QueryData(query, cardcode, dbParameter):
     if (dbParameter == "TM"):
         # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                    "Server=10.10.10.100;"
+                    # "Server=10.10.10.100;"
+                    "Server=jdry1.ifrserp.net,445;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     elif (dbParameter == "LB"):
         # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                    "Server=10.10.10.100;"
+                    # "Server=10.10.10.100;"
+                    "Server=jdry1.ifrserp.net,445;"
                     "Database=LB;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     else:
         # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                    "Server=10.10.10.100;"
+                    # "Server=10.10.10.100;"
+                    "Server=jdry1.ifrserp.net,445;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
@@ -491,13 +495,51 @@ query_4A = (""" SELECT T0.CardCode,T0.CardName,T0.DocNum,
             WHERE T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%' """)
 
 
-def QueryDataALL(query):
+def QueryDataALL(query , dbParameter):
+
+    if (dbParameter is None):
+        dbParameter = "TM"
+    cnxn_str = ""
+
+    if (dbParameter == "TM"):
+        # cnxn_str = ("Driver={SQL Server};"
+        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    # "Server=10.10.10.100;"
+                    "Server=jdry1.ifrserp.net,445;"
+                    "Database=TM;"
+                    "UID=ayman;"
+                    "PWD=admin@1234;")
+    elif (dbParameter == "LB"):
+        # cnxn_str = ("Driver={SQL Server};"
+        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    # "Server=10.10.10.100;"
+                    "Server=jdry1.ifrserp.net,445;"
+                    "Database=LB;"
+                    "UID=ayman;"
+                    "PWD=admin@1234;")
+    else:
+        # cnxn_str = ("Driver={SQL Server};"
+        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    # "Server=10.10.10.100;"
+                    "Server=jdry1.ifrserp.net,445;"
+                    "Database=TM;"
+                    "UID=ayman;"
+                    "PWD=admin@1234;")
+
+    #cnxn = pyodbc.connect(cnxn_str)
+
+    #data = pd.read_sql(query, cnxn, params=[cardcode])
+
+    #return data
+
+
     # cnxn_str = ("Driver={SQL Server};"
-    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                "Server=10.10.10.100;"
-                "Database=LB;"
-                "UID=ayman;"
-                "PWD=admin@1234;")
+    # # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+    #             # "Server=10.10.10.100;"
+    #             "Server=jdry1.ifrserp.net,445;"
+    #             "Database=LB;"
+    #             "UID=ayman;"
+    #             "PWD=admin@1234;")
     cnxn = pyodbc.connect(cnxn_str)
     data = pd.read_sql(query, cnxn, params=[])
 
@@ -573,22 +615,22 @@ def update_ARwithATRALL(df1, df2, pathFinal):
     return df1.to_excel(pathFinal, index=False)
 
 
-def startingPointALL(checkValue):
+def startingPointALL(checkValue , dbParamerter):
     finalPath = ""
     # LB_AvaliableToReturn.xlsx
     randomFileName = generate_random_string("ALL", 7)
     finalPath = finalPath + "./AyDjanRepo/static/" + randomFileName + ".xlsx"
 
     if checkValue == True:
-        out_df1 = QueryDataALL(query_3A)
+        out_df1 = QueryDataALL(query_3A,dbParamerter)
         out_ATR = AvaliableToReturnALL(out_df1)
-        out_df2 = QueryDataALL(query_4A)
+        out_df2 = QueryDataALL(query_4A,dbParamerter)
         update_ARwithATRALL(out_df2, out_ATR, finalPath)
 
     else:
-        out_df1 = QueryDataALL(query_1A)
+        out_df1 = QueryDataALL(query_1A,dbParamerter)
         out_ATR = AvaliableToReturnALL(out_df1)
-        out_df2 = QueryDataALL(query_2A)
+        out_df2 = QueryDataALL(query_2A,dbParamerter)
         update_ARwithATRALL(out_df2, out_ATR, finalPath)
 
     return randomFileName
@@ -687,7 +729,8 @@ query_4B = (""" SELECT D1.CardFName,T0.CardCode,T0.CardName,T0.DocNum,
 def QueryDataB(query):
     # cnxn_str = ("Driver={SQL Server};"
     cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                "Server=10.10.10.100;"
+                # "Server=10.10.10.100;"
+                "Server=jdry1.ifrserp.net,445;"
                 "Database=LB;"
                 "UID=ayman;"
                 "PWD=admin@1234;")
