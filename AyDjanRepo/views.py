@@ -14,7 +14,7 @@ import datetime
 import os
 import warnings
 warnings.filterwarnings('ignore')
-
+from functools import partial
 
 def clearStaticPath():
     current_directory = os.getcwd()
@@ -141,7 +141,8 @@ def cardcodeController(request):
 
     dbParam = str(db_name)
 
-    fileName = startingPoint(input_data, sample_data, dbParam)
+    if db_name != None:
+        fileName = partial(startingPoint(input_data, sample_data, dbParam))
 
     context = {
         'input_data': input_data,
@@ -526,20 +527,6 @@ def QueryDataALL(query , dbParameter):
                     "UID=ayman;"
                     "PWD=admin@1234;")
 
-    #cnxn = pyodbc.connect(cnxn_str)
-
-    #data = pd.read_sql(query, cnxn, params=[cardcode])
-
-    #return data
-
-
-    # cnxn_str = ("Driver={SQL Server};"
-    # # cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-    #             # "Server=10.10.10.100;"
-    #             "Server=jdry1.ifrserp.net,445;"
-    #             "Database=LB;"
-    #             "UID=ayman;"
-    #             "PWD=admin@1234;")
     cnxn = pyodbc.connect(cnxn_str)
     data = pd.read_sql(query, cnxn, params=[])
 
