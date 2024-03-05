@@ -449,9 +449,9 @@ query_2A = (""" SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum,
            ELSE sum(T1.Quantity) END AS 'Quantity',
            MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
-           WHERE  T0.CardCode = (?) AND  T0.CANCELED ='N' AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' 
+           WHERE   T0.CANCELED ='N' AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' 
 	   	   GROUP BY T0.CardCode,  T0.DocDate, T0.DocNum, T1.ItemCode """)
-
+# T0.CardCode = (?) AND 
 
 # In[4]:
 
@@ -499,9 +499,9 @@ query_4A = (""" SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum,
            ELSE sum(T1.Quantity) END AS 'Quantity',
            MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
-           WHERE  T0.CardCode = (?) AND  T0.CANCELED ='N' AND ISNULL(T0.Comments,0) LIKE N'%عين%' 
+           WHERE   T0.CANCELED ='N' AND ISNULL(T0.Comments,0) LIKE N'%عين%' 
 	   	   GROUP BY T0.CardCode,  T0.DocDate, T0.DocNum, T1.ItemCode """)
-
+# T0.CardCode = (?) AND
 
 def QueryDataALL(query , dbParameter):
 
