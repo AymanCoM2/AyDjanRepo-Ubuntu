@@ -143,6 +143,8 @@ def cardcodeController(request):
 
     if db_name != None:
         fileName = partial(startingPoint(input_data, sample_data, dbParam))
+    else :
+        fileName = "test.xml"
 
     context = {
         'input_data': input_data,
