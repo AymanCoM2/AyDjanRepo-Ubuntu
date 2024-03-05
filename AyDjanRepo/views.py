@@ -277,24 +277,24 @@ def QueryData(query, cardcode, dbParameter):
     if (dbParameter == "TM"):
         # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                    # "Server=10.10.10.100;"
-                    "Server=jdry1.ifrserp.net,445;"
+                    "Server=10.10.10.100;"
+                    # "Server=jdry1.ifrserp.net,445;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     elif (dbParameter == "LB"):
         # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                    # "Server=10.10.10.100;"
-                    "Server=jdry1.ifrserp.net,445;"
+                    "Server=10.10.10.100;"
+                    # "Server=jdry1.ifrserp.net,445;"
                     "Database=LB;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     else:
         # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                    # "Server=10.10.10.100;"
-                    "Server=jdry1.ifrserp.net,445;"
+                    "Server=10.10.10.100;"
+                    # "Server=jdry1.ifrserp.net,445;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
@@ -504,24 +504,24 @@ def QueryDataALL(query , dbParameter):
     if (dbParameter == "TM"):
         # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                    # "Server=10.10.10.100;"
-                    "Server=jdry1.ifrserp.net,445;"
+                    "Server=10.10.10.100;"
+                    # "Server=jdry1.ifrserp.net,445;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     elif (dbParameter == "LB"):
         # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                    # "Server=10.10.10.100;"
-                    "Server=jdry1.ifrserp.net,445;"
+                    "Server=10.10.10.100;"
+                    # "Server=jdry1.ifrserp.net,445;"
                     "Database=LB;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
     else:
         # cnxn_str = ("Driver={SQL Server};"
         cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                    # "Server=10.10.10.100;"
-                    "Server=jdry1.ifrserp.net,445;"
+                    "Server=10.10.10.100;"
+                    # "Server=jdry1.ifrserp.net,445;"
                     "Database=TM;"
                     "UID=ayman;"
                     "PWD=admin@1234;")
@@ -729,8 +729,8 @@ query_4B = (""" SELECT D1.CardFName,T0.CardCode,T0.CardName,T0.DocNum,
 def QueryDataB(query):
     # cnxn_str = ("Driver={SQL Server};"
     cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                # "Server=10.10.10.100;"
-                "Server=jdry1.ifrserp.net,445;"
+                "Server=10.10.10.100;"
+                # "Server=jdry1.ifrserp.net,445;"
                 "Database=LB;"
                 "UID=ayman;"
                 "PWD=admin@1234;")
