@@ -169,7 +169,7 @@ def cardcodeControllerB(request):
 
     dbParam = str(db_name)
 
-    fileName = startingPoint(input_data, sample_data, dbParam)
+    fileName = startingPointB(input_data, sample_data, dbParam)
 
     context = {
         'input_data': input_data,
@@ -217,13 +217,14 @@ query_1 = ("""With INV AS(
            WHERE R.CardCode = (?) 
            ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
-query_2 = (""" SELECT T0.CardCode,T0.CardName,T0.DocNum, 
-           T0.DocDate,T1.ItemCode, T1.Dscription,
-           CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
-           ELSE T1.Quantity END AS 'Quantity',
-           T1.INMPrice,T0.Comments 
+query_2 = (""" SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
+           T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+           CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
+           ELSE sum(T1.Quantity) END AS 'Quantity',
+           MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
-          WHERE  T0.CardCode = (?) AND  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' """)
+           WHERE  T0.CardCode = (?) AND  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' 
+	   	   GROUP BY T0.CardCode,  T0.DocDate, T0.DocNum, T1.ItemCode """)
 
 query_3 = ("""With INV AS(
            SELECT 
@@ -259,12 +260,14 @@ query_3 = ("""With INV AS(
            WHERE R.CardCode = (?) 
            ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
-query_4 = ("""SELECT T0.CardCode,T0.CardName,T0.DocNum, 
-           T0.DocDate,T1.ItemCode, T1.Dscription,
-		   CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
-           ELSE T1.Quantity END AS 'Quantity',T1.INMPrice,T0.Comments 
+query_4 = ("""SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
+           T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+           CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
+           ELSE sum(T1.Quantity) END AS 'Quantity',
+           MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
-           WHERE  T0.CardCode = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'""")
+           WHERE  T0.CardCode = (?) AND  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%' 
+	   	   GROUP BY T0.CardCode,  T0.DocDate, T0.DocNum, T1.ItemCode""")
 
 # This is the Line TO CHANGE
 
@@ -438,13 +441,14 @@ query_1A = (""" With INV AS(
 # In[3]:
 
 
-query_2A = (""" SELECT T0.CardCode,T0.CardName,T0.DocNum, 
-            T0.DocDate,T1.ItemCode, T1.Dscription,
-            CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
-            ELSE T1.Quantity END AS 'Quantity',
-            T1.INMPrice,T0.Comments 
-            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
-            WHERE  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' """)
+query_2A = (""" SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
+           T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+           CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
+           ELSE sum(T1.Quantity) END AS 'Quantity',
+           MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
+           FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
+           WHERE  T0.CardCode = (?) AND  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' 
+	   	   GROUP BY T0.CardCode,  T0.DocDate, T0.DocNum, T1.ItemCode""")
 
 
 # In[4]:
@@ -487,13 +491,14 @@ query_3A = (""" With INV AS(
 
 
 
-query_4A = (""" SELECT T0.CardCode,T0.CardName,T0.DocNum, 
-            T0.DocDate,T1.ItemCode, T1.Dscription,
-	    CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
-            ELSE T1.Quantity END AS 'Quantity',
-	    T1.INMPrice,T0.Comments 
-            FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
-            WHERE T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%' """)
+query_4A = (""" SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
+           T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+           CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
+           ELSE sum(T1.Quantity) END AS 'Quantity',
+           MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
+           FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry) 
+           WHERE  T0.CardCode = (?) AND  T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%' 
+	   	   GROUP BY T0.CardCode,  T0.DocDate, T0.DocNum, T1.ItemCode """)
 
 
 def QueryDataALL(query , dbParameter):
@@ -660,13 +665,14 @@ WHERE R.[Foreign Name] =(?)
 ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
 
-query_2B = ("""SELECT D1.CardFName'Foreign Name',T0.CardCode,T0.CardName,T0.DocNum, 
-            T0.DocDate,T1.ItemCode, T1.Dscription,
-	    CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
-            ELSE T1.Quantity END AS 'Quantity',
-	    T1.INMPrice,T0.Comments 
+query_2B = ("""SELECT MAX(D1.CardFName)'Foreign Name',T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
+            T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+	    CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
+           ELSE sum(T1.Quantity) END AS 'Quantity',
+           MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
             FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry LEFT JOIN OCRD D1 ON T0.CardCode = D1.CardCode) 
-            WHERE  D1.CardFName = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%' """)
+            WHERE  D1.CardFName = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) NOT LIKE N'%عين%'
+			GROUP BY T0.CardCode,  T0.DocDate, T0.DocNum, T1.ItemCode """)
 
 query_3B = (""" With INV AS(
             SELECT 
@@ -704,25 +710,49 @@ query_3B = (""" With INV AS(
             WHERE R.[Foreign Name] = (?) 
             ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """ )
 
-query_4B = (""" SELECT D1.CardFName,T0.CardCode,T0.CardName,T0.DocNum, 
-            T0.DocDate,T1.ItemCode, T1.Dscription,
-			CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and T1.Quantity=500 THEN T1.Quantity-99 
-            ELSE T1.Quantity END AS 'Quantity',
-			T1.INMPrice,T0.Comments 
+query_4B = (""" SELECT MAX(D1.CardFName)'Foreign Name',T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
+            T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+	    CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
+           ELSE sum(T1.Quantity) END AS 'Quantity',
+           MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
             FROM (OINV T0 INNER JOIN INV1 T1 ON T0.DocEntry = T1.DocEntry LEFT JOIN OCRD D1 ON T0.CardCode = D1.CardCode) 
-            WHERE D1.CardFName = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%' """)
+            WHERE  D1.CardFName = (?) AND T0.CANCELED ='N'AND ISNULL(T0.Comments,0) LIKE N'%عين%'
+			GROUP BY T0.CardCode,  T0.DocDate, T0.DocNum, T1.ItemCode""")
 
 
-def QueryDataB(query):
-    # cnxn_str = ("Driver={SQL Server};"
-    cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
-                "Server=10.10.10.100;"
-                # "Server=jdry1.ifrserp.net,445;"
-                "Database=LB;"
-                "UID=ayman;"
-                "PWD=admin@1234;")
+def QueryDataB(query,Foreignname,dbParameter):
+    if (dbParameter is None):
+        dbParameter = "TM"
+    cnxn_str = ""
+
+    if (dbParameter == "TM"):
+        # cnxn_str = ("Driver={SQL Server};"
+        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    "Server=10.10.10.100;"
+                    # "Server=jdry1.ifrserp.net,445;"
+                    "Database=TM;"
+                    "UID=ayman;"
+                    "PWD=admin@1234;")
+    elif (dbParameter == "LB"):
+        # cnxn_str = ("Driver={SQL Server};"
+        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    "Server=10.10.10.100;"
+                    # "Server=jdry1.ifrserp.net,445;"
+                    "Database=LB;"
+                    "UID=ayman;"
+                    "PWD=admin@1234;")
+    else:
+        # cnxn_str = ("Driver={SQL Server};"
+        cnxn_str = ("Driver={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.10.so.4.1};"
+                    "Server=10.10.10.100;"
+                    # "Server=jdry1.ifrserp.net,445;"
+                    "Database=TM;"
+                    "UID=ayman;"
+                    "PWD=admin@1234;")
+
     cnxn = pyodbc.connect(cnxn_str)
-    data = pd.read_sql(query, cnxn, params=[])
+    data = pd.read_sql(query, cnxn, params=[Foreignname])
+
     return data
 
 
@@ -794,22 +824,22 @@ def update_ARwithATRB(df1, df2, pathFinal):
     return df1.to_excel(pathFinal, index=False)
 
 
-def startingPointB(checkValue):
+def startingPointB(input_data,checkValue,dbParameter):
     finalPath = ""
     # LB_AvaliableToReturn.xlsx
     randomFileName = generate_random_string("ALL", 7)
     finalPath = finalPath + "./AyDjanRepo/static/" + randomFileName + ".xlsx"
 
     if checkValue == True:
-        out_df1 = QueryDataB(query_3A)
+        out_df1 = QueryDataB(query_3A,Foreignname,dbParameter)
         out_ATR = AvaliableToReturnB(out_df1)
-        out_df2 = QueryDataB(query_4A)
+        out_df2 = QueryDataB(query_4A,Foreignname,dbParameter)
         update_ARwithATRB(out_df2, out_ATR, finalPath)
 
     else:
-        out_df1 = QueryDataB(query_1A)
+        out_df1 = QueryDataB(query_1A,Foreignname,dbParameter)
         out_ATR = AvaliableToReturnB(out_df1)
-        out_df2 = QueryDataB(query_2A)
+        out_df2 = QueryDataB(query_2A,Foreignname,dbParameter)
         update_ARwithATRB(out_df2, out_ATR, finalPath)
 
     return randomFileName
