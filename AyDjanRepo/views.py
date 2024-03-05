@@ -218,7 +218,7 @@ query_1 = ("""With INV AS(
            ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
 query_2 = (""" SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
-           T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+           T0.DocDate,T1.ItemCode, MAX(T1.Dscription)'Dscription',
            CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
            ELSE sum(T1.Quantity) END AS 'Quantity',
            MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
@@ -261,7 +261,7 @@ query_3 = ("""With INV AS(
            ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """)
 
 query_4 = ("""SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
-           T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+           T0.DocDate,T1.ItemCode, MAX(T1.Dscription)'Dscription',
            CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
            ELSE sum(T1.Quantity) END AS 'Quantity',
            MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
@@ -442,7 +442,7 @@ query_1A = (""" With INV AS(
 
 
 query_2A = (""" SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
-           T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+           T0.DocDate,T1.ItemCode, MAX(T1.Dscription)'Dscription',
            CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
            ELSE sum(T1.Quantity) END AS 'Quantity',
            MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
@@ -492,7 +492,7 @@ query_3A = (""" With INV AS(
 
 
 query_4A = (""" SELECT T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
-           T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+           T0.DocDate,T1.ItemCode, MAX(T1.Dscription)'Dscription',
            CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
            ELSE sum(T1.Quantity) END AS 'Quantity',
            MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
@@ -666,7 +666,7 @@ ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum
 
 
 query_2B = ("""SELECT MAX(D1.CardFName)'Foreign Name',T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
-            T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+            T0.DocDate,T1.ItemCode, MAX(T1.Dscription)'Dscription',
 	    CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
            ELSE sum(T1.Quantity) END AS 'Quantity',
            MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
@@ -711,7 +711,7 @@ query_3B = (""" With INV AS(
             ORDER BY R.RDocDate ASC,R.RDocNum ASC, R.ItemCode ASC,V.VDocDate DESC, V.VDocNum DESC """ )
 
 query_4B = (""" SELECT MAX(D1.CardFName)'Foreign Name',T0.CardCode,MAX(T0.CardName)'CardName',T0.DocNum, 
-            T0.DocDate,T1.ItemCode, MAX(T1.Dscription),
+            T0.DocDate,T1.ItemCode, MAX(T1.Dscription)'Dscription',
 	    CASE WHEN T1.ItemCode ='25090102067' and T0.DocNum='101194' and sum(T1.Quantity)=500 THEN SUM(T1.Quantity-99)
            ELSE sum(T1.Quantity) END AS 'Quantity',
            MAX(T1.INMPrice)'INMPrice',MAX(T0.Comments )'Comments' 
